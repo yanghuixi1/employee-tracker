@@ -124,4 +124,13 @@ function askQuestions() {
     });
 }
 
+conn.query("CREATE DATABASE IF NOT EXISTS company");
+conn.query("USE company");
+let commands = fs.readFileSync("./db/schema.sql").toString().split(";");
+let cleanCommands = commands.map((cmd) => cmd.replace(/\n/g, ""));
+cleanCommands.pop();
+for (let i = 0; i < cleanCommands.length; i++) {
+  conn.query(cleanCommands[i]);
+}
+
 askQuestions();
