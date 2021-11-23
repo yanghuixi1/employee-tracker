@@ -18,6 +18,10 @@ function displayRoles() {}
 
 function displayEmployees() {}
 
+function insertDepartment(departmentName) {
+  conn.query(`INSERT INTO department (name) VALUES (\'${departmentName}\');`);
+}
+
 function askDepartmentQuestions() {
   inquirer
     .prompt([
@@ -28,6 +32,7 @@ function askDepartmentQuestions() {
       },
     ])
     .then((answers) => {
+      insertDepartment(answers.departmentName);
       askQuestions();
     });
 }
