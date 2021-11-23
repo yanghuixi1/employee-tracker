@@ -1,4 +1,16 @@
 const inquirer = require("inquirer");
+// Import and require mysql2
+const mysql = require("mysql2");
+const fs = require("fs");
+
+// Connect to database
+const conn = mysql.createConnection({
+  host: "localhost",
+  // MySQL username,
+  user: "root",
+  // MySQL password
+  password: "",
+});
 
 function displayDepartments() {}
 
