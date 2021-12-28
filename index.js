@@ -52,7 +52,91 @@ function displayRoles() {
 }
 
 function insertDepartment(departmentName) {
-  conn.query(`INSERT INTO department (name) VALUES (\'${departmentName}\');`);
+  conn.query(`INSERT INTO department (name) VALUES ('${departmentName}');`);
+  askQuestions();
+}
+
+function insertRole(title, salary, department) {
+  conn.query(
+    `SELECT id from department WHERE name='${department}'`,
+    function (err, results) {
+      if (results.length === 0) {
+        console.log(
+          `\n\nThere is no department with the name '${department}'. Please add that department try again.\n`
+        );
+        askQuestions();
+      } else {
+        let departmentId = results[0].id;
+        conn.query(`INSERT INTO role (title, salary, department_id) VALUES
+      ('${title}', ${salary}, ${departmentId})
+      `);
+        askQuestions();
+      }
+    }
+  );
+}
+
+function insertEmployee(firstName, lastName, employeeRole, manager) {
+  conn.query(
+    `SELECT id FROM role WHERE title='${employeeRole}'`,
+    function (err, roleResults) {
+      if (roleResults.length === 0) {
+        console.log(
+          `\nThere is no role with the name '${employeeRole}'. Please add that role and try again.\n`
+        );
+        askQuestions();
+      } else {
+        let roleId = roleResults[0].id;
+        if (manager === "") {
+          conn.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES
+          ('${firstName}', '${lastName}', ${roleId}, NULL)`);
+          askQuestions();
+        } else {
+          let managerSplit = manager.split(" ");
+          conn.query(
+            `SELECT id FROM employee WHERE first_name='${managerSplit[0]}' AND last_name='${managerSplit[1]}'`,
+            function (err, managerResults) {
+              if (managerResults.length === 0) {
+                console.log(
+                  `\nThere is no manager with the name '${manager}'. Please add that manager and try again.\n`
+                );
+                askQuestions();
+              } else {
+                let managerId = managerResults[0].id;
+                conn.query(
+                  `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES
+            ('${firstName}', '${lastName}', ${roleId}, ${managerId})`
+                );
+                askQuestions();
+              }
+            }
+          );
+        }
+      }
+    }
+  );
+}
+
+function updateEmployeeRole(employee, role) {
+  let employeeSplit = employee.split(" ");
+  conn.query(
+    `SELECT id FROM role WHERE title='${role}'`,
+    function (err, roleResults) {
+      if (roleResults.length === 0) {
+        console.log(
+          `\nThere is no role with the name '${role}'. Please add that role and try again.\n`
+        );
+        askQuestions();
+      } else {
+        let roleId = roleResults[0].id;
+        conn.query(
+          `UPDATE employee SET role_id=${roleId}
+            WHERE first_name='${employeeSplit[0]}' AND last_name='${employeeSplit[1]}'`
+        );
+        askQuestions();
+      }
+    }
+  );
 }
 
 function askDepartmentQuestions() {
@@ -89,7 +173,7 @@ function askRoleQuestions() {
       },
     ])
     .then((answers) => {
-      askQuestions();
+      insertRole(answers.title, answers.salary, answers.department);
     });
 }
 
@@ -118,11 +202,43 @@ function askEmployeeQuestions() {
       },
     ])
     .then((answers) => {
-      askQuestions();
+      insertEmployee(
+        answers.firstName,
+        answers.lastName,
+        answers.employeeRole,
+        answers.manager
+      );
     });
 }
 
-function askUpdateEmployeeQuestions() {}
+function askUpdateEmployeeQuestions() {
+  conn.query(
+    'SELECT CONCAT(first_name, " ", last_name) AS name FROM employee',
+    function (err, results) {
+      inquirer
+        .prompt([
+          {
+            type: "list",
+            message: "Which employees role do you want to update?",
+            choices: Object.values(results),
+            name: "employeeToUpdate",
+          },
+        ])
+        .then((employeeAnswers) => {
+          let employeeToUpdate = employeeAnswers.employeeToUpdate;
+          inquirer
+            .prompt({
+              type: "input",
+              message: `What is ${employeeToUpdate}'s new role?`,
+              name: "updatedRole",
+            })
+            .then((roleAnswers) =>
+              updateEmployeeRole(employeeToUpdate, roleAnswers.updatedRole)
+            );
+        });
+    }
+  );
+}
 
 function askQuestions() {
   inquirer
