@@ -13,7 +13,18 @@ const conn = mysql.createConnection({
   password: "",
 });
 
-function displayDepartments() {}
+function printFormattedResults(results) {
+  console.log("\n");
+  let table = cTable.getTable(results);
+  console.log(table);
+  askQuestions();
+}
+
+function displayDepartments() {
+  conn.query(`SELECT * FROM department ORDER BY id`, function (err, results) {
+    printFormattedResults(results);
+  });
+}
 
 function displayRoles() {}
 
