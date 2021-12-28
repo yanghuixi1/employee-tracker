@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS department (
 CREATE TABLE IF NOT EXISTS role (
     id INT NOT NULL AUTO_INCREMENT,
     title VARCHAR(30),
-    salary DECIMAL(6, 2),
+    salary DECIMAL,
     department_id INT,
     PRIMARY KEY (id),
     FOREIGN KEY (department_id) REFERENCES department(id)
