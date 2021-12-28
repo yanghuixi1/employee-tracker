@@ -28,7 +28,16 @@ function displayDepartments() {
 
 function displayRoles() {}
 
-function displayEmployees() {}
+function displayRoles() {
+  conn.query(
+    `SELECT role.id, title AS title, salary AS salary, name AS department
+        FROM role JOIN department ON role.department_id=department.id
+          ORDER BY role.id`,
+    function (err, results) {
+      printFormattedResults(results);
+    }
+  );
+}
 
 function insertDepartment(departmentName) {
   conn.query(`INSERT INTO department (name) VALUES (\'${departmentName}\');`);
