@@ -32,3 +32,7 @@ Create an issue and pull request as needed
 
 Check out my [GitHub profile](https://github.com/yanghuixi1)!
 If you have any questions or concerns, feel free to email me at <yanghui.xi1@gmail.com>
+
+## Workthrough Video
+
+https://drive.google.com/file/d/1VBsdJuhyxyHAd4N0t0jx205dPA_ZVHqf/view?usp=sharing
