@@ -26,7 +26,19 @@ function displayDepartments() {
   });
 }
 
-function displayRoles() {}
+function displayEmployees() {
+  conn.query(
+    `SELECT e.id, e.first_name, e.last_name, title, department, salary, CONCAT(f.first_name, " ", f.last_name) AS manager FROM
+      (SELECT c.id, first_name, last_name, title, name AS department, salary, manager_id FROM
+        (SELECT a.id, first_name, last_name, title, salary, department_id, manager_id
+          FROM employee a JOIN role b ON a.role_id=b.id)
+            AS c JOIN department AS d ON c.department_id=d.id) AS e LEFT OUTER JOIN employee AS f ON e.manager_id=f.id
+              ORDER BY e.id`,
+    function (err, results) {
+      printFormattedResults(results);
+    }
+  );
+}
 
 function displayRoles() {
   conn.query(
@@ -54,7 +66,6 @@ function askDepartmentQuestions() {
     ])
     .then((answers) => {
       insertDepartment(answers.departmentName);
-      askQuestions();
     });
 }
 
@@ -64,7 +75,7 @@ function askRoleQuestions() {
       {
         type: "input",
         message: "What is the name of the role?",
-        name: "roleName",
+        name: "title",
       },
       {
         type: "input",
